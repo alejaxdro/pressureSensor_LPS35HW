@@ -106,7 +106,7 @@ void LPS35HW::reset(void) {
     @return The current temperature in degrees C
 */
 /**************************************************************************/
-float LPS35HW::readTemperature(void) {
+float LPS35HW::readTemp(void) {
     // Grab temp data - 2 reg reads
     int low = wiringPiI2CReadReg8(fd, LPS35HW_TEMP_OUT_L);
     int temperatureOut = low;
@@ -115,6 +115,7 @@ float LPS35HW::readTemperature(void) {
     //cout << "Temperature Reading: " << (double)temperatureOut / 100.0 << hex << " low: " << low << " high: " << high << endl;
     return (double)temperatureOut / 100.0;
 }
+
 /**************************************************************************/
 /*!
     @brief Reads and scales the value of the pressure register.
@@ -134,6 +135,12 @@ float LPS35HW::readPressure(void) {
     }
     //cout << "Pressure Reading: " << pressureOut << hex << " low: " << low << " mid: " << mid << " high: " << high << endl;
     return (float) raw_pressure / 4096;  // perform sign extension for 24 bit number if needed
+}
+
+
+float LPS35HW::readPsi(void){
+   float tempHPa = readPressure();
+   return tempHPa * 0.014503773;
 }
 
 /**************************************************************************/

@@ -65,8 +65,9 @@ public:
   LPS35HW();
   bool begin_I2C(uint8_t i2c_address);
   void reset(void);
-  float readTemperature(void);
+  float readTemp(void);
   float readPressure(void);
+  float readPsi(void);
   void setDataRate(LPS35HW_DataRate new_rate);
   void takeMeasurement(void);
   void zeroPressure(void);
