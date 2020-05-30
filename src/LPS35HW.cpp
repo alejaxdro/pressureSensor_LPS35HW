@@ -41,38 +41,45 @@ LPS35HW::LPS35HW(void) {}
  *            The Wire object to be used for I2C connections.
  *    @return True if initialization was successful, otherwise false.
  */
-bool LPS35HW::begin_I2C(uint8_t i2c_address) {
-  fd = wiringPiI2CSetup(i2c_address);
+bool LPS35HW::begin_I2C(uint8_t i2c_address)
+{
+    fd = wiringPiI2CSetup(i2c_address);
 
-  return init();
+    return init();
 }
 
-bool LPS35HW::init(void) {
-  // make sure we're talking to the right chip
+bool LPS35HW::init(void)
+{
+    // make sure we're talking to the right chip
     int result = wiringPiI2CReadReg8(fd, LPS35HW_WHO_AM_I);
-    if(result == -1){
+    if(result == -1)
+    {
         cout << "Error. Errno is: " << errno << endl;
         return false;
-    }else if (result == 0xb1){
+    }
+    else if (result == 0xb1)
+    {
         // 0xb1/177 is the chip id from ST datasheet
         cout << "Pressure Sensor LPS35HW connected" << endl;
-    }else{
+    }
+    else
+    {
         cout << "Error. Result is: " << result << endl;
         return false;
     }
 
-  int Config1 = wiringPiI2CReadReg8(fd, LPS35HW_CTRL_REG1);
-  int Config2 = wiringPiI2CReadReg8(fd, LPS35HW_CTRL_REG2);
-  int Config3 = wiringPiI2CReadReg8(fd, LPS35HW_CTRL_REG3);
-  int InterruptCfg = wiringPiI2CReadReg8(fd, LPS35HW_INTERRUPT_CFG);
-  int InterruptStatus = wiringPiI2CReadReg8(fd, LPS35HW_INT_SOURCE);
-  cout << "Config1: " << hex << Config1 << " Config2: " << Config2 << " Config3: " << Config3 << " IntCfg: " << InterruptCfg << " IntStatus: " << InterruptStatus << endl;
+    int Config1 = wiringPiI2CReadReg8(fd, LPS35HW_CTRL_REG1);
+    int Config2 = wiringPiI2CReadReg8(fd, LPS35HW_CTRL_REG2);
+    int Config3 = wiringPiI2CReadReg8(fd, LPS35HW_CTRL_REG3);
+    int InterruptCfg = wiringPiI2CReadReg8(fd, LPS35HW_INTERRUPT_CFG);
+    int InterruptStatus = wiringPiI2CReadReg8(fd, LPS35HW_INT_SOURCE);
+    cout << "Config1: " << hex << Config1 << " Config2: " << Config2 << " Config3: " << Config3 << " IntCfg: " << InterruptCfg << " IntStatus: " << InterruptStatus << endl;
 
-  reset();
+    reset();
 
-  setDataRate(LPS35HW_RATE_10_HZ);
+    setDataRate(LPS35HW_RATE_10_HZ);
 
-  return true;
+    return true;
 }
 
 /**************************************************************************/
@@ -80,7 +87,8 @@ bool LPS35HW::init(void) {
     @brief Sets Block Reads.
 */
 /**************************************************************************/
-void LPS35HW::setBlockReads(void){
+void LPS35HW::setBlockReads(void)
+{
     // setup block reads
     int Config1 = wiringPiI2CReadReg8(fd, LPS35HW_CTRL_REG1);
     wiringPiI2CWriteReg8(fd, LPS35HW_CTRL_REG1, ((uint8_t)Config1 | 0x02));
@@ -92,7 +100,8 @@ void LPS35HW::setBlockReads(void){
             default values, the same as a power-on reset.
 */
 /**************************************************************************/
-void LPS35HW::reset(void) {
+void LPS35HW::reset(void)
+{
     int regval;
     regval = wiringPiI2CReadReg8(fd, LPS35HW_CTRL_REG2);
     //cout << "Ctrl Reg 2: " << hex << regval << endl;
@@ -106,7 +115,8 @@ void LPS35HW::reset(void) {
     @return The current temperature in degrees C
 */
 /**************************************************************************/
-float LPS35HW::readTemp(void) {
+float LPS35HW::readTemp(void)
+{
     // Grab temp data - 2 reg reads
     int low = wiringPiI2CReadReg8(fd, LPS35HW_TEMP_OUT_L);
     int temperatureOut = low;
@@ -122,7 +132,8 @@ float LPS35HW::readTemp(void) {
     @return The current pressure in hPa, relative to the reference temperature
 */
 /**************************************************************************/
-float LPS35HW::readPressure(void) {
+float LPS35HW::readPressure(void)
+{
     int low = wiringPiI2CReadReg8(fd, LPS35HW_PRESS_OUT_XL);
     int raw_pressure = low;
     int mid = wiringPiI2CReadReg8(fd, LPS35HW_PRESS_OUT_L);
@@ -130,7 +141,8 @@ float LPS35HW::readPressure(void) {
     int high = wiringPiI2CReadReg8(fd, LPS35HW_PRESS_OUT_H);
     raw_pressure |= high << 16;
     // perform sign extension for 24 bit number if needed
-    if (raw_pressure & 0x800000) {
+    if (raw_pressure & 0x800000)
+    {
         raw_pressure = (0xff000000 | raw_pressure);
     }
     //cout << "Pressure Reading: " << pressureOut << hex << " low: " << low << " mid: " << mid << " high: " << high << endl;
@@ -138,9 +150,10 @@ float LPS35HW::readPressure(void) {
 }
 
 
-float LPS35HW::readPsi(void){
-   float tempHPa = readPressure();
-   return tempHPa * 0.014503773;
+float LPS35HW::readPsi(void)
+{
+    float tempHPa = readPressure();
+    return tempHPa * 0.014503773;
 }
 
 /**************************************************************************/
@@ -148,7 +161,8 @@ float LPS35HW::readPsi(void){
     @brief Takes a new measurement while in one shot mode.
 */
 /**************************************************************************/
-void LPS35HW::takeMeasurement(void) {
+void LPS35HW::takeMeasurement(void)
+{
 //  Adafruit_BusIO_RegisterBits one_shot =
 //      Adafruit_BusIO_RegisterBits(Config2, 1, 0);
 //  one_shot.write(1);
@@ -164,7 +178,8 @@ void LPS35HW::takeMeasurement(void) {
             called.
 */
 /**************************************************************************/
-void LPS35HW::zeroPressure(void) {
+void LPS35HW::zeroPressure(void)
+{
 //  Adafruit_BusIO_RegisterBits zero_pressure =
 //      Adafruit_BusIO_RegisterBits(InterruptCfg, 1, 5);
 //  zero_pressure.write(1);
@@ -179,7 +194,8 @@ void LPS35HW::zeroPressure(void) {
             are reported as the absolute value.
 */
 /**************************************************************************/
-void LPS35HW::resetPressure(void) {
+void LPS35HW::resetPressure(void)
+{
 //  Adafruit_BusIO_RegisterBits pressure_reset =
 //      Adafruit_BusIO_RegisterBits(InterruptCfg, 1, 4);
 //  pressure_reset.write(1);
@@ -193,7 +209,8 @@ void LPS35HW::resetPressure(void) {
             The threshold pressure in hPa, measured from zero
 */
 /**************************************************************************/
-void LPS35HW::setThresholdPressure(float threshold_pressure) {
+void LPS35HW::setThresholdPressure(float threshold_pressure)
+{
 //  Adafruit_BusIO_Register threshold = Adafruit_BusIO_Register(
 //      i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, LPS35HW_THS_P_L, 2);
 //  threshold.write(threshold_pressure * 16);
@@ -203,7 +220,8 @@ void LPS35HW::setThresholdPressure(float threshold_pressure) {
     @brief Enables high pressure threshold interrupts.
 */
 /**************************************************************************/
-void LPS35HW::enableHighThreshold(void) {
+void LPS35HW::enableHighThreshold(void)
+{
 //  Adafruit_BusIO_RegisterBits high_thresh =
 //      Adafruit_BusIO_RegisterBits(InterruptCfg, 1, 0);
 //  high_thresh.write(0x1);
@@ -216,7 +234,8 @@ void LPS35HW::enableHighThreshold(void) {
     @brief Disables low pressure threshold interrupts.
 */
 /**************************************************************************/
-void LPS35HW::enableLowThreshold(void) {
+void LPS35HW::enableLowThreshold(void)
+{
 //  Adafruit_BusIO_RegisterBits low_thresh =
 //      Adafruit_BusIO_RegisterBits(InterruptCfg, 1, 1);
 //  low_thresh.write(0x1);
@@ -234,7 +253,8 @@ void LPS35HW::enableLowThreshold(void) {
           Set to `true` to have the INT pin be open drain when active.
 */
 /**************************************************************************/
-void LPS35HW::enableInterrupts(bool active_low, bool open_drain) {
+void LPS35HW::enableInterrupts(bool active_low, bool open_drain)
+{
 //  Adafruit_BusIO_RegisterBits pin_mode =
 //      Adafruit_BusIO_RegisterBits(Config3, 2, 6);
 //  pin_mode.write((active_low << 1) | open_drain);
@@ -248,7 +268,8 @@ void LPS35HW::enableInterrupts(bool active_low, bool open_drain) {
     @brief Disables pressure threshold interrupts.
 */
 /**************************************************************************/
-void LPS35HW::disableInterrupts(void) {
+void LPS35HW::disableInterrupts(void)
+{
 //  Adafruit_BusIO_RegisterBits enabled =
 //      Adafruit_BusIO_RegisterBits(InterruptCfg, 2, 2);
 //  enabled.write(0x0);
@@ -260,7 +281,8 @@ void LPS35HW::disableInterrupts(void) {
             Set to `true` to scale the bandwidth to ODR/20
 */
 /**************************************************************************/
-void LPS35HW::enableLowPass(bool extra_low_bandwidth) {
+void LPS35HW::enableLowPass(bool extra_low_bandwidth)
+{
 //  Adafruit_BusIO_RegisterBits filter_config =
 //      Adafruit_BusIO_RegisterBits(Config1, 2, 2);
 //  filter_config.write(0x2 | (extra_low_bandwidth == true));
@@ -273,8 +295,9 @@ void LPS35HW::enableLowPass(bool extra_low_bandwidth) {
           last checked.
 */
 /**************************************************************************/
-bool LPS35HW::highThresholdExceeded(void) {
-  //return (InterruptStatus->read() == 0b101);
+bool LPS35HW::highThresholdExceeded(void)
+{
+    //return (InterruptStatus->read() == 0b101);
 }
 /**************************************************************************/
 /*!
@@ -283,8 +306,9 @@ bool LPS35HW::highThresholdExceeded(void) {
           last checked.
 */
 /**************************************************************************/
-bool LPS35HW::lowThresholdExceeded(void) {
-  //return (InterruptStatus->read() == 0b110);
+bool LPS35HW::lowThresholdExceeded(void)
+{
+    //return (InterruptStatus->read() == 0b110);
 }
 /**************************************************************************/
 /*!
@@ -293,7 +317,8 @@ bool LPS35HW::lowThresholdExceeded(void) {
           The new output data rate to be set (ODR)
 */
 /**************************************************************************/
-void LPS35HW::setDataRate(LPS35HW_DataRate new_rate) {
+void LPS35HW::setDataRate(LPS35HW_DataRate new_rate)
+{
     wiringPiI2CWriteReg8(fd, LPS35HW_CTRL_REG1, (new_rate<<4));
     //cout << "Ctrl Reg 1 ODR write: " << hex << (new_rate<<4) << endl;
 }

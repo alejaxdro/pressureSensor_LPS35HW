@@ -45,44 +45,46 @@ using namespace std;
  *
  * Allowed values for `setDataRate`.
  */
-typedef enum _data_rate {
-  LPS35HW_RATE_ONE_SHOT, /**< ONE_SHOT: Put the sensor in a low power shutdown
+typedef enum _data_rate
+{
+    LPS35HW_RATE_ONE_SHOT, /**< ONE_SHOT: Put the sensor in a low power shutdown
                             mode that will only take a measurement when
                             `takeMeasurement` is called **/
-  LPS35HW_RATE_1_HZ,     /** 1 hz  **/
-  LPS35HW_RATE_10_HZ,    /** 10 hz  **/
-  LPS35HW_RATE_25_HZ,    /** 25 hz  **/
-  LPS35HW_RATE_50_HZ,    /** 50 hz  **/
-  LPS35HW_RATE_75_HZ,    /** 75 hz  **/
+    LPS35HW_RATE_1_HZ,     /** 1 hz  **/
+    LPS35HW_RATE_10_HZ,    /** 10 hz  **/
+    LPS35HW_RATE_25_HZ,    /** 25 hz  **/
+    LPS35HW_RATE_50_HZ,    /** 50 hz  **/
+    LPS35HW_RATE_75_HZ,    /** 75 hz  **/
 } LPS35HW_DataRate;
 
 /*!
  *    @brief  Class that stores state and functions for interacting with
  *            LPS35HW Current and Power Sensor
  */
-class LPS35HW {
+class LPS35HW
+{
 public:
-  LPS35HW();
-  bool begin_I2C(uint8_t i2c_address);
-  void reset(void);
-  float readTemp(void);
-  float readPressure(void);
-  float readPsi(void);
-  void setDataRate(LPS35HW_DataRate new_rate);
-  void takeMeasurement(void);
-  void zeroPressure(void);
-  void resetPressure(void);
-  void setThresholdPressure(float threshold_pressure);
-  void enableHighThreshold(void);
-  void enableLowThreshold(void);
-  bool highThresholdExceeded(void);
-  bool lowThresholdExceeded(void);
-  void enableInterrupts(bool active_low = false, bool open_drain = false);
-  void disableInterrupts(void);
-  void enableLowPass(bool extra_low_bandwidth = false);
-  void setBlockReads(void);
+    LPS35HW();
+    bool begin_I2C(uint8_t i2c_address);
+    void reset(void);
+    float readTemp(void);
+    float readPressure(void);
+    float readPsi(void);
+    void setDataRate(LPS35HW_DataRate new_rate);
+    void takeMeasurement(void);
+    void zeroPressure(void);
+    void resetPressure(void);
+    void setThresholdPressure(float threshold_pressure);
+    void enableHighThreshold(void);
+    void enableLowThreshold(void);
+    bool highThresholdExceeded(void);
+    bool lowThresholdExceeded(void);
+    void enableInterrupts(bool active_low = false, bool open_drain = false);
+    void disableInterrupts(void);
+    void enableLowPass(bool extra_low_bandwidth = false);
+    void setBlockReads(void);
 
 private:
-  bool init(void);
-  int fd;
+    bool init(void);
+    int fd;
 };
